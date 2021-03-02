@@ -1,11 +1,9 @@
 import keras
 from keras.models import Sequential
-from keras.layers import Dropout
-from keras.layers import Flatten
-from keras.layers import Dense
+from keras.layers import Dropout, Flatten, Dense
 from keras.utils import np_utils
-from keras.layers.convolutional import Conv2D
-from keras.layers.convolutional import MaxPooling2D
+from keras.layers.convolutional import Conv2D, MaxPooling2D
+
 
 import pandas as pd
 import seaborn as sb
@@ -15,7 +13,6 @@ from tensorflow.keras.preprocessing import image
 from keras.preprocessing.image import ImageDataGenerator
 from keras.callbacks import EarlyStopping
 from keras.models import load_model
-from PIL import ImageGrab, Image
 
 #### Data Preparation - Load data into train and test sets ####
 # loading the training and test data into pandas dataframes
@@ -162,10 +159,33 @@ datagen.fit(train_xx)
 model = final_model()
 # model = load_model('final_iter1.h5')
 
-scores = model.fit_generator(datagen.flow(train_xx, train_ylabels, batch_size = 200),
-
+scores = model.fit_generator(datagen.flow(train_xx,
+                                          train_ylabels,
+                                          batch_size = 200),
                              validation_data = (val_x, val_y),
                              epochs = 30, verbose = 2, callbacks = [es])
+#--------------------------------------------------------------------------------------
+# function where we will save each model after
+# they are run them for a maximum of 3 epochs. The function
+# returns the model and its respective loss.
+def modelTrain(allModels):
+
+    # list of losses is stored here
+    allLosses = []
+
+    # the fit_generator function trains
+    # the on train data for 3 epochs according
+    # to the train_ylabels variable
+    for i in range(len(allModels)):
+
+        scores = allModels[i].fit_generator(datagen.flow(train_xx, train_ylabels, batch_size = 200),
+                                            validation_data = (val_x, val_y),
+                                            epochs = 3, verbose = 2, callbacks = [es])
+
+        allLosses.append(round(scores.history['loss'][-1], 4))
+
+    return allModels, allLosses
+
 
 
 #-------------------------------------------------------------------------------------
