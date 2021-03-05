@@ -1,4 +1,3 @@
-import keras
 from keras.models import Sequential
 from keras.layers import Dropout, Flatten, Dense
 from keras.utils import np_utils
@@ -159,11 +158,11 @@ datagen.fit(train_xx)
 model = final_model()
 # model = load_model('final_iter1.h5')
 
-scores = model.fit_generator(datagen.flow(train_xx,
-                                          train_ylabels,
-                                          batch_size = 200),
-                             validation_data = (val_x, val_y),
-                             epochs = 30, verbose = 2, callbacks = [es])
+# scores = model.fit_generator(datagen.flow(train_xx,
+#                                           train_ylabels,
+#                                           batch_size = 200),
+#                              validation_data = (val_x, val_y),
+#                              epochs = 30, verbose = 2, callbacks = [es])
 #--------------------------------------------------------------------------------------
 # function where we will save each model after
 # they are run them for a maximum of 3 epochs. The function
@@ -192,13 +191,13 @@ def modelTrain(allModels):
 # subplot displaying and validation loss in terms of the training and validation sets
 plt.subplot(1, 2, 1)
 plt.title('Cross Entropy Loss')
-plt.plot(scores.history['loss'], color='red', label='train')
-plt.plot(scores.history['val_loss'], color='purple', label='test')
+#plt.plot(scores.history['loss'], color='red', label='train')
+#plt.plot(scores.history['val_loss'], color='purple', label='test')
 
 # subplot displaying classification accuracy in terms of the training and validation sets
 plt.subplot(1, 2, 2)
 plt.title('Classification Accuracy')
-plt.plot(scores.history['accuracy'], color='red', label='train')
-plt.plot(scores.history['val_accuracy'], color='purple', label='test')
+#plt.plot(scores.history['accuracy'], color='red', label='train')
+#plt.plot(scores.history['val_accuracy'], color='purple', label='test')
 plt.show()
 
