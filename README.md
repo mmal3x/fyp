@@ -8,7 +8,7 @@
 ## Model 
 - To run an individual instance of the model run the model.py script. 
 
-# GA 
+# Genetic Algorithm 
 - 
 
 
