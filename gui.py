@@ -10,8 +10,13 @@ import numpy as np
 # creating tkinter window
 root = Tk()
 
-# loading saved model
-model = load_model('final_iter.h5')
+# link to JS paint
+new = 1
+url = "https://jspaint.app/#local:41f86bef475158"
+
+# loading saved model from h5 file
+model = load_model('best_model.h5')
+print(model.summary())
 
 # function to obtain image from file directory. The image is pasted on the canvas
 # by taking the dimensions of the image.
@@ -34,11 +39,12 @@ def create_canvas():
             canvasImage = canvasImage.resize((400,400))
 
     except:
-        #  if the image is greter than the 2000x2000 the image is rejected
+        #  if the image is greater than the 2000x2000 the image is rejected
         if(pureImage.size > (2000,2000)):
             messagebox.showerror("Image is too large")
 
-            pureImage is None
+            raise pureImage is None
+
 
     canvasImage = ImageTk.PhotoImage(canvasImage)
     canvas = Canvas(root, width = 500, height = 500)
@@ -52,8 +58,9 @@ def create_canvas():
 # made, the top three are outputted to the screen.
 
 def classify_digit():
-
+    # should the
     try:
+
         pureImage is None
     except:
         messagebox.showinfo("Info", "Please insert an image")
@@ -87,10 +94,10 @@ def classify_digit():
         testImg = testImg.reshape(1,28,28,1)
 
         # the image pixels are normalised in the range 0-255
-        # to
+        # for the purposes of unit length
         testImg = testImg / 255.0
 
-        # classifying the image
+        # classifying the image using the Keras predict() API
         predictions = model.predict([testImg])[0]
 
         digits = sorted(range(len(predictions)), key = lambda i: predictions[i])[-3:]
@@ -126,7 +133,7 @@ def graph():
         messagebox.showinfo("Info", "Please insert an image and/or classify it")
         raise
 
-    global canvas2
+    global chartImage
     global plotToCanvas
 
     # saving the ten predicted classes into lists. [0] = lowest prediction - [9] = highest prediction
@@ -147,10 +154,10 @@ def graph():
     plot = Image.open('plot.png')
     plot2 = plot.resize((450, 300), Image.ANTIALIAS)
     plotToCanvas = ImageTk.PhotoImage(plot2)
-    canvas2 = Canvas(root, width = 500, height = 350)
-    canvas2.pack()
-    canvas2.place(x = 900, y = 450)
-    plot_canvas = canvas2.create_image(0,0, image = plotToCanvas, anchor= NW)
+    chartImage = Canvas(root, width = 500, height = 350)
+    chartImage.pack()
+    chartImage.place(x = 900, y = 450)
+    plot_canvas = chartImage.create_image(0,0, image = plotToCanvas, anchor= NW)
 
 
 # tkinter function destroy() function kills the
@@ -162,12 +169,13 @@ def exitWindow():
 def clear_canvas():
 
     canvas.destroy()
-    canvas2.destroy()
+    chartImage.destroy()
     classAccLabel.destroy()
     firstPredLabel.destroy()
     secondPredLabel.destroy()
     thirdPredLabel.destroy()
-    pureImage, predictions is None
+    pureImage.destroy()
+    predictions.destroy() # these need to be deleted (?)
 
 
 # title of gui

@@ -20,10 +20,11 @@ test = pd.read_csv('mnist_test.csv')
 
 # separating the y label from the original dataset
 train_ylabels = train['label']
+
 # dropping the label column from the training & test datasets
 train_xx = train.drop(labels = ["label"], axis = 1)
 test_xx = test.drop(labels = ["label"], axis = 1)
-# test_xx
+# print(test_xx)
 
 #------------------------------------------------------------------------
 # countplot of y training labels. As this data is labelled
@@ -58,7 +59,8 @@ test_xx = test_xx.values.reshape((test.shape[0], 28, 28, 1)).astype('float32')
 # use one hot encoding in order to classify the outputs
 # the outputs are set to [1,0,0,0,0,0,0,0,0,0] binary vectors
 train_ylabels = np_utils.to_categorical(train_ylabels, num_classes = 10)
-train_ylabels
+
+# print(train_ylabels)
 
 #-----------------------------------------------------------------------------
 
@@ -79,44 +81,44 @@ g = plt.imshow(train_xx[10][:,:,0], cmap = 'Greys')
 
 def final_model():
 
-    model = Sequential()
+    modelInstance = Sequential()
 
     # two convolutional layers with sizes 30. The ReLu activation function
     # is used for both of these layers. A max pooling layer
     # removes noisy activations the first two CNN layers.
-    model.add(Conv2D(filters = 30, kernel_size = (5,5),
+    modelInstance.add(Conv2D(filters = 30, kernel_size = (5,5),
                      input_shape = (28, 28, 1),
                      activation = 'relu'))
 
     # the maxpooling layer downsamples the noisy the activations
     # using a 2x2 filter
-    model.add(MaxPooling2D(pool_size = (2,2)))
+    modelInstance.add(MaxPooling2D(pool_size = (2,2)))
 
 
-    model.add(Conv2D(filters = 15, kernel_size = (3,3),
+    modelInstance.add(Conv2D(filters = 15, kernel_size = (3,3),
                      activation = 'relu'))
 
-    model.add(MaxPooling2D(pool_size = (2,2)))
+    modelInstance.add(MaxPooling2D(pool_size = (2,2)))
 
     # drop-out is a regularisation technique to reduce the model
     # overfitting on the training data. A random % of the
     # activations are kept while the others are dropped as their
     # weights are zeroed out.
-    model.add(Dropout(0.3))
+    modelInstance.add(Dropout(0.3))
 
     # the flatten layer converts the feature maps of the convolutional
     # layer into vector representatation for the dense layer to
     # further learn the local features.
-    model.add(Flatten())
+    modelInstance.add(Flatten())
 
     # three fully-connected layers are used once the layers have been
     # flattened to provide the the  classifier w/ learnable
     # inputs from the pixels. The activation functions relu and
     # softmax are used to add nonlinearity to the model
     # and subsequently optimise the model.
-    model.add(Dense(256, activation = 'relu'))
-    model.add(Dense(100, activation = 'relu'))
-    model.add(Dense(10, activation = 'softmax'))
+    modelInstance.add(Dense(256, activation = 'relu'))
+    modelInstance.add(Dense(100, activation = 'relu'))
+    modelInstance.add(Dense(10, activation = 'softmax'))
 
 
     # Compiling the model. Cross categorical entropy has been used
@@ -125,11 +127,11 @@ def final_model():
     # are required as the output.
 
 
-    model.compile(loss = 'categorical_crossentropy',
+    modelInstance.compile(loss = 'categorical_crossentropy',
                   optimizer = 'adam', metrics = ['accuracy'])
 
 
-    return model
+    return modelInstance
 
 #-------------------------------------------------------------------------------
 # simple early stopping to stop the training once the model
@@ -154,50 +156,63 @@ datagen = ImageDataGenerator(zoom_range = 0.1,
 datagen.fit(train_xx)
 
 #-------------------------------------------------------------------------------
-#### Fit the model ####
-model = final_model()
-# model = load_model('final_iter1.h5')
+#### Function to train a single model ####
 
-# scores = model.fit_generator(datagen.flow(train_xx,
-#                                           train_ylabels,
-#                                           batch_size = 200),
-#                              validation_data = (val_x, val_y),
-#                              epochs = 30, verbose = 2, callbacks = [es])
+def trainModel():
+    model = final_model()
+
+    # model = load_model('final_iter1.h5')
+
+    # training the model for 30 epochs with a batch size of 200, callbacks with a
+    # patience of 10 and the image data generator which extends the size of the train set
+    scores = model.fit_generator(datagen.flow(train_xx,
+                                              train_ylabels,
+                                              batch_size = 200),
+                                 validation_data = (val_x, val_y),
+                                 epochs = 5, verbose = 2, callbacks = [es])
+
+    # Executing the the training for a single model. The scores and the loss info are displayed
+    # live and at the end of the training process for each epoch.
+
+
+    # subplot displaying and validation loss in terms of the training and validation sets
+    plt.subplot(1, 2, 1)
+    plt.title('Cross Entropy Loss')
+    plt.plot(scores.history['loss'], color='red', label='train')
+    plt.plot(scores.history['val_loss'], color='purple', label='test')
+
+    # subplot displaying classification accuracy in terms of the training and validation sets
+    plt.subplot(1, 2, 2)
+    plt.title('Classification Accuracy')
+    plt.plot(scores.history['accuracy'], color='red', label='train')
+    plt.plot(scores.history['val_accuracy'], color='purple', label='test')
+    plt.show()
+
+
 #--------------------------------------------------------------------------------------
 # function where we will save each model after
 # they are run them for a maximum of 3 epochs. The function
 # returns the model and its respective loss.
-def modelTrain(allModels):
+def trainMultiple(allModels):
 
     # list of losses is stored here
     allLosses = []
 
     # the fit_generator function trains
-    # the on train data for 3 epochs according
+    # the on training data for 3 epochs according
     # to the train_ylabels variable
     for i in range(len(allModels)):
 
         scores = allModels[i].fit_generator(datagen.flow(train_xx, train_ylabels, batch_size = 200),
                                             validation_data = (val_x, val_y),
-                                            epochs = 3, verbose = 2, callbacks = [es])
+                                            epochs = 1, verbose = 2, callbacks = [es])
 
         allLosses.append(round(scores.history['loss'][-1], 4))
 
     return allModels, allLosses
 
-
-
 #-------------------------------------------------------------------------------------
-# subplot displaying and validation loss in terms of the training and validation sets
-plt.subplot(1, 2, 1)
-plt.title('Cross Entropy Loss')
-#plt.plot(scores.history['loss'], color='red', label='train')
-#plt.plot(scores.history['val_loss'], color='purple', label='test')
 
-# subplot displaying classification accuracy in terms of the training and validation sets
-plt.subplot(1, 2, 2)
-plt.title('Classification Accuracy')
-#plt.plot(scores.history['accuracy'], color='red', label='train')
-#plt.plot(scores.history['val_accuracy'], color='purple', label='test')
-plt.show()
+
+
 
