@@ -6,6 +6,25 @@ from tkinter import messagebox
 import matplotlib.pyplot as plt
 import numpy as np
 
+# setting the initial values of the key variables to None as they do not have any data on entry
+pureImage, testImg = None, None
+predictions, digits, accuracy, percentage, allPreds, allDigits, acc = None, None, None, None, None, None, None
+classAccLabel = None
+firstPredLabel = None
+secondPredLabel = None
+thirdPredLabel = None
+
+# saving the original None values of the variables above
+pureImage2, testImg2 = pureImage, testImg
+predictions2, digits2, accuracy2, percentage2, allPreds2, allDigits2, acc2 = predictions, digits, accuracy, percentage, allPreds, allDigits, acc
+classAccLabel2 = classAccLabel
+firstPredLabel2 = firstPredLabel
+secondPredLabel2 = secondPredLabel
+thirdPredLabel2 = thirdPredLabel
+
+# (pureImage, testImg, predictions, digits, accuracy,
+#  percentage, allPreds, allDigits, acc, classAccLabel, firstPredLabel, secondPredLabel, thirdPredLabel)
+
 
 # creating tkinter window
 root = Tk()
@@ -16,7 +35,6 @@ url = "https://jspaint.app/#local:41f86bef475158"
 
 # loading saved model from h5 file
 model = load_model('best_model.h5')
-print(model.summary())
 
 # function to obtain image from file directory. The image is pasted on the canvas
 # by taking the dimensions of the image.
@@ -27,20 +45,19 @@ def create_canvas():
     global width
     global height
     global canvas
-    global x
 
     # prompting user to open image from the file system.
     pureImage = Image.open(tkfd.askopenfilename(title="Select an image", filetypes = [("PNG image", "*.png"), ("JPEG image", "*.jpg")]))
-    canvasImage = pureImage  # the canvas image
+    canvasImage = pureImage  # the canvas image is one which will shrunk and outputted to the screen.
 
     try:
         # resizing the image to fit the canvas.
-        if(canvasImage.size > (500,500)):
+        if canvasImage.size > (500,500):
             canvasImage = canvasImage.resize((400,400))
 
     except:
         #  if the image is greater than the 2000x2000 the image is rejected
-        if(pureImage.size > (2000,2000)):
+        if pureImage.size > (2000,2000):
             messagebox.showerror("Image is too large")
 
             raise pureImage is None
@@ -49,7 +66,7 @@ def create_canvas():
     canvasImage = ImageTk.PhotoImage(canvasImage)
     canvas = Canvas(root, width = 500, height = 500)
     canvas.pack()
-    x = canvas.create_image(0,0, image = canvasImage, anchor= NW)
+    canvas.create_image(0,0, image = canvasImage, anchor= NW)
 
 
 # in this function, the image is normalised and converted to
@@ -58,20 +75,19 @@ def create_canvas():
 # made, the top three are outputted to the screen.
 
 def classify_digit():
-    # should the
-    try:
-
-        pureImage is None
-    except:
-        messagebox.showinfo("Info", "Please insert an image")
-        raise
 
     global firstPredLabel, secondPredLabel, thirdPredLabel
     global predictions
     global testImg
     global digits
     global accuracy
+    global percentage
     global classAccLabel
+
+    # should the user click on the classify digit button w/o inserting an image, the exception prompting them to insert
+    # an image is raised.
+    if pureImage is None and testImg is None and predictions is None and digits is None and percentage is None and accuracy is None and classAccLabel is None and firstPredLabel is None and secondPredLabel is None and thirdPredLabel is None:
+        raise Exception(messagebox.showinfo("Info", "Please insert an image an image"))
 
     # getting the raw image
     testImg = pureImage
@@ -83,7 +99,7 @@ def classify_digit():
         # resizing the image to 28x28 pixels
         testImg = testImg.resize((28,28))
 
-        #converting the image from rgb to grey-scale using the pillow module
+        #converting the image from rgb to grey-scale using the convert api from the api module
         testImg = testImg.convert('L')
 
         # the image is converted to an array of image pixels for the convolution process to occur.
@@ -100,6 +116,7 @@ def classify_digit():
         # classifying the image using the Keras predict() API
         predictions = model.predict([testImg])[0]
 
+        # sorting list of classification accuracy and prediction score to get the top 3 predictions.
         digits = sorted(range(len(predictions)), key = lambda i: predictions[i])[-3:]
         accuracy = [predictions[i] for i in np.argsort(predictions)[-3:]]
         accuracy = np.array(accuracy)
@@ -126,15 +143,20 @@ def classify_digit():
 # to help with readability.
 def graph():
 
-    try:
-        predictions is None
-    except:
-
-        messagebox.showinfo("Info", "Please insert an image and/or classify it")
-        raise
-
     global chartImage
+    global plot
+    global resizedPlot
     global plotToCanvas
+    global allDigits
+    global allPreds
+    global acc
+
+    # exception block which prompts the user to insert and/or classify an image if the clear digit has been clicked
+    if predictions is None and allDigits is None and allPreds is None and acc is None: # and plotToCanvas is None and chartImage is None and resizedPlot is None and plot is None
+            raise Exception(messagebox.showinfo("Info", "Please insert an image and/or classify it"))
+
+        # predictions is None or allDigits is None or allPreds is None or acc is Non
+
 
     # saving the ten predicted classes into lists. [0] = lowest prediction - [9] = highest prediction
     allDigits = sorted(range(len(predictions)), key = lambda i: predictions[i])[-10:] # x-axis labels
@@ -144,20 +166,26 @@ def graph():
     allPreds = np.array(allPreds)
     acc = allPreds * 100
 
+    # clearing any saved info from previous plots
+    plt.clf()
+    plt.cla()
+    plt.close()
+
     # graph of the predicted probabilities of each class.
     plt.title('SoftMax Probabilites of all classes')
     plt.xlabel('Class')
     plt.ylabel('Accuracy (%)')
     plt.bar(allDigits, acc, color = ['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'fuchsia', 'lavender', 'black', 'brown'])
     plt.xticks(allDigits) # setting the x-scale to display 0-9
+    # os.remove("plot.png") # removing the plot before a new one is saved
     plt.savefig('plot.png')
     plot = Image.open('plot.png')
-    plot2 = plot.resize((450, 300), Image.ANTIALIAS)
-    plotToCanvas = ImageTk.PhotoImage(plot2)
+    resizedPlot = plot.resize((450, 300), Image.ANTIALIAS)
+    plotToCanvas = ImageTk.PhotoImage(resizedPlot)
     chartImage = Canvas(root, width = 500, height = 350)
     chartImage.pack()
     chartImage.place(x = 900, y = 450)
-    plot_canvas = chartImage.create_image(0,0, image = plotToCanvas, anchor= NW)
+    chartImage.create_image(0,0, image = plotToCanvas, anchor= NW)
 
 
 # tkinter function destroy() function kills the
@@ -168,15 +196,27 @@ def exitWindow():
 # function call to clear the image, classification labels and graph from the page
 def clear_canvas():
 
+    # tkinter destroy api all of the widgets on the canvas.
     canvas.destroy()
     chartImage.destroy()
     classAccLabel.destroy()
     firstPredLabel.destroy()
     secondPredLabel.destroy()
     thirdPredLabel.destroy()
-    pureImage.destroy()
-    predictions.destroy() # these need to be deleted (?)
+    resetVar() # function which resets the variables to None
 
+def resetVar():
+    global pureImage, testImg
+    global predictions, digits, accuracy, percentage, allPreds, allDigits, acc
+    global classAccLabel, firstPredLabel, secondPredLabel, thirdPredLabel
+
+    # resetting the the variables back to None once the user has clicked clear digit
+    pureImage, testImg = pureImage2, testImg2
+    predictions, digits, accuracy, percentage, allPreds, allDigits, acc = predictions2, digits2, accuracy2, percentage2, allPreds2, allDigits2, acc2
+    classAccLabel = classAccLabel2
+    firstPredLabel = firstPredLabel2
+    secondPredLabel = secondPredLabel2
+    thirdPredLabel = thirdPredLabel2
 
 # title of gui
 root.title("Handwritten Digit Classification")
@@ -207,6 +247,7 @@ def help():
     info.pack()
     info.place(x = 50, y = 100)
 
+
 # button configuration. Here we create the five buttons needed for the app to run smoothly.
 # one of the functions in the command parameters are called once the user clicks on a button
 btn_graph = Button(root, text = "Show Accuracies", padx = 40, pady = 20, command = graph)
@@ -217,7 +258,7 @@ btn_help = Button(root, text = "Help", command = help)
 btn_quit = Button(root, text = "Quit", command = exitWindow)
 
 
-# placing the button on the screen.
+# placing the buttons on the screen.
 btn_graph.place(x = 100, y = 650)
 btn_classify.place(x = 350, y = 650)
 btn_clear.place(x = 600, y = 650)
@@ -225,11 +266,6 @@ btn_insert.place(x = 50, y = 20)
 btn_help.place(x = 150, y = 20)
 btn_quit.place(x = 1300, y = 20)
 
-# checking the size of the plot
-plotToCanvas = Image.open('plot.png')
-width, height = plotToCanvas.size
-print(width, height)
-# 640 480
 
 # ensures the program continues
 root.mainloop()
