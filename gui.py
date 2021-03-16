@@ -5,6 +5,7 @@ from tkinter import filedialog as tkfd
 from tkinter import messagebox
 import matplotlib.pyplot as plt
 import numpy as np
+import webbrowser as wb
 
 # setting the initial values of the key variables to None as they do not have any data on entry
 pureImage, testImg = None, None
@@ -29,16 +30,12 @@ thirdPredLabel2 = thirdPredLabel
 # creating tkinter window
 root = Tk()
 
-# link to JS paint
-new = 1
-url = "https://jspaint.app/#local:41f86bef475158"
-
 # loading saved model from h5 file
 model = load_model('best_model.h5')
 
 # function to obtain image from file directory. The image is pasted on the canvas
 # by taking the dimensions of the image.
-def create_canvas():
+def insert_digit():
 
     global pureImage
     global canvasImage
@@ -87,7 +84,7 @@ def classify_digit():
     # should the user click on the classify digit button w/o inserting an image, the exception prompting them to insert
     # an image is raised.
     if pureImage is None and testImg is None and predictions is None and digits is None and percentage is None and accuracy is None and classAccLabel is None and firstPredLabel is None and secondPredLabel is None and thirdPredLabel is None:
-        raise Exception(messagebox.showinfo("Info", "Please insert an image an image"))
+        raise Exception(messagebox.showinfo("Info", "Please insert an image"))
 
     # getting the raw image
     testImg = pureImage
@@ -205,6 +202,8 @@ def clear_canvas():
     thirdPredLabel.destroy()
     resetVar() # function which resets the variables to None
 
+# function which sets all of the crucial variables to None due to there being no data when
+# the user has just
 def resetVar():
     global pureImage, testImg
     global predictions, digits, accuracy, percentage, allPreds, allDigits, acc
@@ -218,6 +217,30 @@ def resetVar():
     secondPredLabel = secondPredLabel2
     thirdPredLabel = thirdPredLabel2
 
+# function which opens the paint tool once the url is clicked
+def callback(url):
+
+    wb.open_new(url)
+
+# useful information
+def help():
+    info = Label(root, text = "WELCOME!\n\n\n This app classifies digits from 0-9.\n\n"
+                              "1. First draw a digit using a paint tool or by hand. \n\n "
+                              "NOTE:The background should preferably be \n\n"
+                              "black or another dark colour with the digit\n\n"
+                              "in white. Use the paint tools to make the \n\n"
+                              "necessary changes.\n\n"
+                              "2. Save the image as a png or jpeg.\n\n"
+                              "3. Insert the image using the button on \n\n"
+                              "the top left.\n\n"
+                              "4. Hit the classify button to test your \n\n"
+                              "digit and ouput the top 3 predictions.\n\n"
+                              "5. For further prediction information, \n\n"
+                              "click Show Accuracies\n\n", font = ("Helvitica", 14, "bold"), justify=LEFT)
+
+    info.pack()
+    info.place(x = 50, y = 100)
+
 # title of gui
 root.title("Handwritten Digit Classification")
 
@@ -229,34 +252,19 @@ title = Label(root, text = "DigiFY App!", font =("Helvitica", 24, "bold"))
 # outputting it to the screen, keeping the contents compact
 title.pack(pady = 20)
 
-# useful information
-def help():
-    info = Label(root, text = "WELCOME!\n\n\n This app classifies digits from 0-9.\n\n"
-                              "1. First draw a digit using a paint tool \n\n "
-                              "[https://jspaint.app/#local:41f86bef475158] \n\n"
-                              "NOTE:The background preferably should be \n\n"
-                              "black or another dark colour\n\n"
-                              "2. Save the image as a png or jpeg\n\n"
-                              "3. Insert the image using the button on \n\n" 
-                              "the top left\n\n"
-                              "4. Hit the classify button to test your \n\n"
-                              "digit and ouput the top 3 predictions\n\n"
-                              "5. For further prediction information, \n\n"
-                              "click Show Accuracies\n\n", font = ("Helvitica", 14, "bold"), justify=LEFT)
-
-    info.pack()
-    info.place(x = 50, y = 100)
-
+# link to the paint tool
+btn_paint = Label(root, text = "Click here to draw your digit", fg= "blue", cursor = "hand2")
+btn_paint.place(x = 200, y = 22)
+btn_paint.bind("<Button-1>", lambda e: callback("https://jspaint.app/#local:41f86bef475158"))
 
 # button configuration. Here we create the five buttons needed for the app to run smoothly.
 # one of the functions in the command parameters are called once the user clicks on a button
 btn_graph = Button(root, text = "Show Accuracies", padx = 40, pady = 20, command = graph)
 btn_classify = Button(root, text = "Classify Digit", padx = 40, pady = 20, command = classify_digit)
 btn_clear = Button(root, text = "Clear Digit", padx = 40, pady = 20, command = clear_canvas)
-btn_insert = Button(root, text = "Insert Image", command = create_canvas)
+btn_insert = Button(root, text = "Insert Image", command = insert_digit)
 btn_help = Button(root, text = "Help", command = help)
 btn_quit = Button(root, text = "Quit", command = exitWindow)
-
 
 # placing the buttons on the screen.
 btn_graph.place(x = 100, y = 650)

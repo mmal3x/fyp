@@ -34,16 +34,16 @@ def mutation(newModel):
         # multiply the bias weights by a random number  between
         # -0.5 and 0.5
         for b in range(len(newModel.layers[l].get_weights()[1])):
-            x_ran = rand.random()  # getting random value
+            m_rand = rand.random()  # getting random value
 
-            if(x_ran < mutation_rate):
+            if(m_rand < mutation_rate):
                 newModel.layers[l].get_weights()[1][b] = newModel.layers[l].get_weights()[1][b] * rand.uniform(-0.5, 0.5)
 
     # the weights of each of each layer are
     for lx in layers:
         for wt in newModel.layers[lx].get_weights()[0]:
-            x_ran = rand.random()
-            if(x_ran < mutation_rate):
+            m_rand = rand.random()
+            if(m_rand < mutation_rate):
                 for ly in range(len(wt)):
                     y_ran = rand.random()
                     if(y_ran < mutation_rate):
@@ -81,6 +81,13 @@ def crossover(models):
                 first_parent = rand.choice(models[:])
                 second_parent = rand.choice(models[:])
 
+            # should the random number be less than the crossover
+            # rate, the weights of the parents are swapped to diversify
+            # the models by allowing them to access the weights
+            # of other models (group conciousness)
+            # c_rand = rand.random()
+            # if(c_rand < crossover_rate):
+
             for i in layers:
                 weightsFirst = first_parent.layers[i].get_weights()[1]
 
@@ -90,15 +97,14 @@ def crossover(models):
 
                 newModel = rand.choice([first_parent, second_parent])
 
-
         else:
             newModel = rand.choice(models[:])
 
 
-        # once crossover is complete the new model
-        # is ready to be mutated and added to the
-        # new models list.
-        newModels.append(mutation(newModel))
+            # once crossover is complete the new model
+            # is ready to be mutated and added to the
+            # new models list.
+            newModels.append(mutation(newModel))
 
     return newModels
 
