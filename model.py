@@ -11,7 +11,6 @@ import matplotlib.pyplot as plt
 from tensorflow.keras.preprocessing import image
 from keras.preprocessing.image import ImageDataGenerator
 from keras.callbacks import EarlyStopping
-from keras.models import load_model
 
 #### Data Preparation - Load data into train and test sets ####
 # loading the training and test data into pandas dataframes
@@ -160,8 +159,6 @@ datagen.fit(train_xx)
 
 def trainModel():
     model = final_model()
-
-    # model = load_model('final_iter1.h5')
 
     # training the model for 30 epochs with a batch size of 200, callbacks with a
     # patience of 10 and the image data generator which extends the size of the train set
