@@ -23,11 +23,15 @@ def initialise():
 # and random values are assigned to certain weights
 # within the boundary.
 def mutation(newModel):
-    # weights = []
+
 
     # mutation of randomly selected weights in a newly
-    # created model. This is essential for the convergence
-    # of the GA.
+    # created model. This is essential for the exploration
+    # of the search space. This helps the GA avoid a lack
+    # of range (diversity) in the solutions. The higher the mut_rate, the more
+    # diversified the population becomes at the expense of convergence.
+    # This is where crossover comes in to allow the algorithm to
+    # converge more quickly.
     for l in layers:
 
         # should the random value be less than the mut rate
@@ -39,7 +43,8 @@ def mutation(newModel):
             if(m_rand < mutation_rate):
                 newModel.layers[l].get_weights()[1][b] = newModel.layers[l].get_weights()[1][b] * rand.uniform(-0.5, 0.5)
 
-    # the weights of each of each layer are
+    # the weights of each of each layer are multiplied by a random value
+    # between -0.5 and 0.5.
     for lx in layers:
         for wt in newModel.layers[lx].get_weights()[0]:
             m_rand = rand.random()

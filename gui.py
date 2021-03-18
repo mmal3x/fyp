@@ -27,11 +27,11 @@ thirdPredLabel2 = thirdPredLabel
 #  percentage, allPreds, allDigits, acc, classAccLabel, firstPredLabel, secondPredLabel, thirdPredLabel)
 
 
-# creating tkinter window
+# creating tkinter window instance
 root = Tk()
 
 # loading saved model from h5 file
-model = load_model('best_model.h5')
+best_model = load_model('best_model.h5')
 
 # function to obtain image from file directory. The image is pasted on the canvas
 # by taking the dimensions of the image.
@@ -110,8 +110,8 @@ def classify_digit():
         # for the purposes of unit length
         testImg = testImg / 255.0
 
-        # classifying the image using the Keras predict() API
-        predictions = model.predict([testImg])[0]
+        # classifying the image using the keras predict API
+        predictions = best_model.predict([testImg])[0]
 
         # sorting list of classification accuracy and prediction score to get the top 3 predictions.
         digits = sorted(range(len(predictions)), key = lambda i: predictions[i])[-3:]
@@ -193,7 +193,7 @@ def exitWindow():
 # function call to clear the image, classification labels and graph from the page
 def clear_canvas():
 
-    # tkinter destroy api all of the widgets on the canvas.
+    # tkinter api destroy() removes all of the widgets from the canvas.
     canvas.destroy()
     chartImage.destroy()
     classAccLabel.destroy()

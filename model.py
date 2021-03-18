@@ -17,7 +17,7 @@ from keras.callbacks import EarlyStopping
 train = pd.read_csv('mnist_train.csv')
 test = pd.read_csv('mnist_test.csv')
 
-# separating the y label from the original dataset
+# separating the y label (the class) from the original dataset
 train_ylabels = train['label']
 
 # dropping the label column from the training & test datasets
@@ -65,13 +65,13 @@ train_ylabels = np_utils.to_categorical(train_ylabels, num_classes = 10)
 
 ### Setting the random seed to 2. The random seed helps with the model's reproducibility of results.
 random_seed = 2
-
+test_perc = 0.15
 from sklearn.model_selection import train_test_split
 # Splitting the training & validation sets to evaluate the
 # performance of the model by fitting the model. The test set includes 10,500 images - the training set includes 59,500 images
 train_xx, val_x, train_ylabels, val_y = train_test_split(train_xx,
                                                          train_ylabels,
-                                                         test_size = 0.15,
+                                                         test_size = test_perc,
                                                          random_state = random_seed)
 
 
