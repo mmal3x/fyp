@@ -1,4 +1,9 @@
-# import model as mod
+# import model as modpla
+import time
+import os
+
+os.environ["KERAS_BACKEND"] = "plaidml.keras.backend"
+
 import random as rand
 from model import trainMultiple, final_model
 from keras.models import save_model
@@ -146,6 +151,8 @@ def main():
     global models
     global layers
 
+    start = time.time()
+
     # the initialise method appends 10 model architectures into models []
     initialise()
 
@@ -172,7 +179,8 @@ def main():
     finalLosses = sorted(range(len(lossInfo)), key=lambda i:lossInfo[i])
     finalModels = [models[i] for i in finalLosses]
 
-    print(finalLosses[1])
+
+    print("\nRan in {} seconds".format(time.time()-start))
 
     bestModel.append(finalModels[0])
     bestM = bestModel.pop()
