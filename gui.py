@@ -26,7 +26,6 @@ thirdPredLabel2 = thirdPredLabel
 # (pureImage, testImg, predictions, digits, accuracy,
 #  percentage, allPreds, allDigits, acc, classAccLabel, firstPredLabel, secondPredLabel, thirdPredLabel)
 
-
 # creating tkinter window instance
 root = Tk()
 
@@ -43,9 +42,12 @@ def insert_digit():
     global height
     global canvas
 
+    if pureImage is not None:
+        raise Exception(messagebox.showinfo("Info", "Image is already inserted"))
+
     # prompting user to open image from the file system.
     pureImage = Image.open(tkfd.askopenfilename(title="Select an image", filetypes = [("PNG image", "*.png"), ("JPEG image", "*.jpg")]))
-    canvasImage = pureImage  # the canvas image is one which will shrunk and outputted to the screen.
+    canvasImage = pureImage  # the canvas image is one which will be shrunk and outputted to the screen.
 
     try:
         # resizing the image to fit the canvas.
@@ -55,9 +57,8 @@ def insert_digit():
     except:
         #  if the image is greater than the 2000x2000 the image is rejected
         if pureImage.size > (2000,2000):
-            messagebox.showerror("Image is too large")
-
-            raise pureImage is None
+            pureImage = pureImage2
+            raise Exception(messagebox.showinfo("Info", "Image is too large"))
 
 
     canvasImage = ImageTk.PhotoImage(canvasImage)
@@ -80,6 +81,8 @@ def classify_digit():
     global accuracy
     global percentage
     global classAccLabel
+
+
 
     # should the user click on the classify digit button w/o inserting an image, the exception prompting them to insert
     # an image is raised.

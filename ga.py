@@ -94,18 +94,18 @@ def crossover(models):
             # should the random number be less than the crossover
             # rate, the weights of the parents are swapped to diversify
             # the models by allowing them to access the weights
-            # of other models (group conciousness)
-            # c_rand = rand.random()
-            # if(c_rand < crossover_rate):
+            # of other models (group consciousness)
 
             for i in layers:
-                weightsFirst = first_parent.layers[i].get_weights()[1]
+                c_rand = rand.random()
+                if(c_rand < crossover_rate):
+                    weightsFirst = first_parent.layers[i].get_weights()[1]
 
-                # crossing over the weights of the second parent to the first parent & vice versa
-                first_parent.layers[i].get_weights()[1] = second_parent.layers[i].get_weights()[1]
-                second_parent.layers[i].get_weights()[1] = weightsFirst
+                    # crossing over the weights of the second parent to the first parent & vice versa
+                    first_parent.layers[i].get_weights()[1] = second_parent.layers[i].get_weights()[1]
+                    second_parent.layers[i].get_weights()[1] = weightsFirst
 
-                newModel = rand.choice([first_parent, second_parent])
+                    newModel = rand.choice([first_parent, second_parent])
 
         else:
             newModel = rand.choice(models[:])
@@ -114,7 +114,7 @@ def crossover(models):
             # once crossover is complete the new model
             # is ready to be mutated and added to the
             # new models list.
-            newModels.append(mutation(newModel))
+        newModels.append(mutation(newModel))
 
     return newModels
 
@@ -158,39 +158,47 @@ def main():
 
     for gen_no in range(generations):
 
+        gen_counter = gen_no + 1
         # calling the trainMultiple function created in model.py
         # to train many models over x epochs and print the loss information
-        models, lossInfo = trainMultiple(models)
-        print(lossInfo)
-        stringInfo = ', '.join(str(v) for v in lossInfo)
-        print("Generation Number: " + str((gen_no + 1)) + "\n" + "Loss Values for each member: " + stringInfo)
+        models, loss, validAccs = trainMultiple(models)
+        print(loss)
+        lossInfo = ', '.join(str(v) for v in loss)
+        print("Generation Number: " + str((gen_counter)) + "\n" + "Training loss Values for each member: \n" + lossInfo)
 
         # the trained models and loss info are used to
         # select the next population
-        models = selection(models, lossInfo)
+        models = selection(models, loss)
 
 
     # getting the best model
     bestModel = []
 
-    # retrieving the model with the lowest loss by assigning a fitness
-    # value to all the models in order to order them accordingly in
-    # the model list
-    finalLosses = sorted(range(len(lossInfo)), key=lambda i:lossInfo[i])
-    finalModels = [models[i] for i in finalLosses]
+    # retrieving the model with the highest validation accuracy by assigning a
+    # value to all the the accuracies - thereby ordering the models accordingly
+    sortedValAccs = sorted(validAccs)
+    finalValidAccs = sorted(range(len(validAccs)), key=lambda i:validAccs[i])
+    finalModels = [models[i] for i in finalValidAccs]
+
+    finalModels.reverse() # best model comes first
 
 
-    print("\nRan in {} seconds".format(time.time()-start))
+    print("\nRan in {} seconds".format(time.time() -start))
+
+    validInfo = ', '.join(str(v) for v in sortedValAccs)
+    print("Validation Accuracies of the final 10 models: \n" + validInfo)
 
     bestModel.append(finalModels[0])
     bestM = bestModel.pop()
 
-    bestM.save('best_model.h5')
 
+    bestM.save('best_model.h5')
 
 
 if __name__ == "__main__":
     main()
+
+
 
 
 

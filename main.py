@@ -14,7 +14,9 @@ def main():
 
     #print("\nRun individual CNN model, Genetic CNN model or GUI: \n")
 
-    mod.trainModel()
+    # model, scores = mod.trainModel()
+
+
 
     # print("\nRan in {} seconds".format(time.time()-start))
 
