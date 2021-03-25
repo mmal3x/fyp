@@ -6,11 +6,12 @@ from keras.preprocessing.image import ImageDataGenerator
 from keras.callbacks import EarlyStopping
 
 import pandas as pd
-#import seaborn as sb
+import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import precision_recall_fscore_support, confusion_matrix
+from sklearn.preprocessing import LabelEncoder
 
 
 #### Data Preparation - Load data into train and test sets ####
@@ -60,8 +61,7 @@ test = test.values.reshape((test.shape[0], 28, 28, 1)).astype('float32')
 # use one hot encoding in order to classify the outputs
 # the outputs are set to [1,0,0,0,0,0,0,0,0,0] binary vectors
 train_ylabels = np_utils.to_categorical(train_ylabels, num_classes = 10)
-
-# print(train_ylabels)
+# print(train_ylabels.shape)
 
 #-----------------------------------------------------------------------------
 
@@ -161,22 +161,23 @@ datagen.fit(train)
 #### Function to train a single model ####
 
 def trainModel():
+    # saving a single model instance
     model = final_model()
 
+    # Executing the the training for a single model. The scores and the loss info are displayed
+    # live and at the end of the training process for each epoch.
     # training the model for 30 epochs with a batch size of 200, callbacks with a
     # patience of 10 and the image data generator which extends the size of the train set
     scores = model.fit_generator(datagen.flow(train,
                                               train_ylabels,
                                               batch_size = 100),
                                  validation_data = (val_x, val_y),
-                                 epochs = 3, verbose = 2)
+                                 epochs = 1, verbose = 2)
 
 
     # getting the mean validation accuracy across all epochs
-    print(np.mean(scores.history['val_accuracy'])) # getting the avg validation loss
+    print("Average validation accuracy across all epochs: " + str(np.mean(scores.history['val_accuracy'])))
 
-    # Executing the the training for a single model. The scores and the loss info are displayed
-    # live and at the end of the training process for each epoch.
 
     # subplot displaying and validation loss in terms of the training and validation sets
     plt.subplot(1, 2, 1)
@@ -219,58 +220,84 @@ def trainMultiple(allModels):
 
 #-------------------------------------------------------------------------------------
 
-# using trained model to predict on the test set
+# the evaluate function takes three parameters -
+# the test_y data and the predictions of the model on the test data,
+# as well as the labels to build the confusion matrix.
+def evaluate(actual, predicted, labels):
 
-def evaluate(y_true, y_predictions, labels):
     # precision, recall, f1 and support scores classification scores.
 
-    # y_true = 423
-    # y_predictions = 423
-
-    pr, rec, f1, sup = precision_recall_fscore_support(y_true, y_predictions)
-    total_pr = np.average(pr, weights=sup)
-    total_rec = np.average(rec, weights=sup)
-    total_f1 = np.average(f1, weights=sup)
-    total_sup = np.sum(sup)
+    pre, rec, f1_score, inst = precision_recall_fscore_support(actual, predicted)
+    tot_pre = np.average(pre, weights=inst)
+    tot_rec = np.average(rec, weights=inst)
+    tot_f1 = np.average(f1_score, weights=inst)
+    tot_sup = np.sum(inst)
     # output table 1
     dict1 = pd.DataFrame({
         u'Label': labels,
-        u'Precision': pr,
+        u'Precision': pre,
         u'Recall': rec,
-        u'F1': f1,
-        u'Support': sup
+        u'F1': f1_score,
+        u'Support': inst
     })
     # output table 2
     dict2 = pd.DataFrame({
-        u'Label': [u'overall'],
-        u'Precision': [total_pr],
-        u'Recall': [total_rec],
-        u'F1': [total_f1],
-        u'Support': [total_sup]
+        u'Label': [u'Average'],
+        u'Precision': [tot_pre],
+        u'Recall': [tot_rec],
+        u'F1': [tot_f1],
+        u'Support': [tot_sup]
     })
 
-    dict2.index = [999]
+    dict2.index = [99]
 
     # concatenating the two dictionaries
     dictionary = pd.concat([dict1, dict2])
 
     # output table 2
-    confusion_mat = pd.DataFrame(confusion_matrix(y_true, y_predictions), columns=labels, index=labels)
+    confusion_mat = pd.DataFrame(confusion_matrix(actual, predicted), columns=labels, index=labels)
 
     return confusion_mat, dictionary[[u'Label', u'Precision', u'Recall', u'F1', u'Support']]
 
 
 def main():
+
     # returning the trained model and the binary label vectors
     model = trainModel() # saving trained model
-    print(len(test_ylabels)) # actual outputs
 
-    # using the model to make predictions on the unseen test set
-    y_preds = model.predict(test)
+    # labels for each digit in the test dataset converted from a df column
+    # to a list
+    y_true = test_dataset['label'].tolist()
+    print(y_true)
 
-    # convert the predictions to binary vectors in order to compare the predicted
+    # label encoding the test data labels so the confusion matrix can
+    # be calculated
+    labelEncoder = LabelEncoder()
+    y = labelEncoder.fit_transform(y_true)
+    test_y = y[len(test)-1]
+
+    # using the label encoder to retrieve the labels for each class.
+    classLabels = labelEncoder.classes_
+
+    # using the trained model to make predictions on the unseen test set
+    y_preds = model.predict(test) # this is printing the softmax probabilities
+
+    # converting the predictions to binary vectors in order to compare the predicted
     # values w/ the actual values. val_y is the expected output of the val_x input
     predicted_classes = np.argmax(y_preds, axis=1)
+    print(predicted_classes.tolist())
+
+    # evaluating the model on the test data find out the strength of the model
+    # on unseen data.
+    conf_matrix, evalScores = evaluate(y_true, predicted_classes, classLabels)
+    print(conf_matrix)
+    print(evalScores)
+
+    # plotting heatmap of confusion matrix.
+    plt.figure(figsize=(10, 7))
+    sns.heatmap(conf_matrix, annot=True, fmt= ".1f")
+    plt.show()
+
 
 if __name__ == "__main__":
     main()
