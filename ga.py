@@ -6,14 +6,15 @@ os.environ["KERAS_BACKEND"] = "plaidml.keras.backend"
 
 import random as rand
 from model import trainMultiple, final_model
-#from keras.models import save_model
+from keras.models import save_model
+import statistics
 
 layers = [0, 2, 6, 7, 8] # the layers in the convnet which contain weights (the filters are the learnable parameters)
 model_pop = 10 # defining 10 individuals in the init population
 generations = 2 # defining the stopping limit for the number of generations to train and breed
 mutation_rate = 0.1 # 10% mutation rate
 models = [] # storing each model
-crossover_rate = 0.8 # 80% crossover rate  ***HERE: INCOPORATE THIS INTO CROSSOVER
+crossover_rate = 0.8 # 80% crossover rate
 
 # function to generate the first generation of models
 def initialise():
@@ -151,7 +152,6 @@ def main():
     global models
     global layers
 
-    start = time.time()
 
     # the initialise method appends 10 model architectures into models []
     initialise()
@@ -170,6 +170,7 @@ def main():
         # select the next population
         models = selection(models, loss)
 
+
     # getting the best model
     bestModel = []
 
@@ -182,15 +183,15 @@ def main():
     finalModels.reverse() # best model comes first
 
 
-    print("\nRan in {} seconds".format(time.time() -start))
-
     validInfo = ', '.join(str(v) for v in sortedValAccs)
     print("Validation Accuracies of the final 10 models: \n" + validInfo)
+    print("Average validation accuracy of all final pop models: " + str(statistics.mean(sortedValAccs)))
+
 
     bestModel.append(finalModels[0])
     bestM = bestModel.pop()
 
-    # saving the best model in terms of validation accuracy
+
     bestM.save('best_model.h5')
 
 
