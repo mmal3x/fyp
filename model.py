@@ -175,7 +175,7 @@ def trainModel():
                                  epochs = 1, verbose = 2)
 
 
-    # getting the mean validation accuracy across all epochs
+    # getting the mean validation accuracy across all epochs in order to calculate the avg error.
     print("Average validation accuracy across all epochs: " + str(np.mean(scores.history['val_accuracy'])))
 
 

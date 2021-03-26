@@ -6,7 +6,7 @@ os.environ["KERAS_BACKEND"] = "plaidml.keras.backend"
 
 import random as rand
 from model import trainMultiple, final_model
-from keras.models import save_model
+#from keras.models import save_model
 
 layers = [0, 2, 6, 7, 8] # the layers in the convnet which contain weights (the filters are the learnable parameters)
 model_pop = 10 # defining 10 individuals in the init population
@@ -170,7 +170,6 @@ def main():
         # select the next population
         models = selection(models, loss)
 
-
     # getting the best model
     bestModel = []
 
@@ -191,7 +190,7 @@ def main():
     bestModel.append(finalModels[0])
     bestM = bestModel.pop()
 
-
+    # saving the best model in terms of validation accuracy
     bestM.save('best_model.h5')
 
 

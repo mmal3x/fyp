@@ -277,6 +277,5 @@ btn_insert.place(x = 50, y = 20)
 btn_help.place(x = 150, y = 20)
 btn_quit.place(x = 1300, y = 20)
 
-
 # ensures the program continues
 root.mainloop()
