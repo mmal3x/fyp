@@ -6,7 +6,6 @@ import time
 #
 import model as mod
 
-# https://stackoverflow.com/questions/43650099/a-switch-case-program-in-python
 
 def main():
 
@@ -15,8 +14,6 @@ def main():
     #print("\nRun individual CNN model, Genetic CNN model or GUI: \n")
 
     # model, scores = mod.trainModel()
-
-
 
     # print("\nRan in {} seconds".format(time.time()-start))
 

@@ -1,9 +1,3 @@
-# import model as modpla
-import time
-import os
-
-os.environ["KERAS_BACKEND"] = "plaidml.keras.backend"
-
 import random as rand
 from model import trainMultiple, final_model
 from keras.models import save_model
@@ -29,7 +23,6 @@ def initialise():
 # and random values are assigned to certain weights
 # within the boundary.
 def mutation(newModel):
-
 
     # mutation of randomly selected weights in a newly
     # created model. This is essential for the exploration
@@ -152,7 +145,6 @@ def main():
     global models
     global layers
 
-
     # the initialise method appends 10 model architectures into models []
     initialise()
 
@@ -187,10 +179,8 @@ def main():
     print("Validation Accuracies of the final 10 models: \n" + validInfo)
     print("Average validation accuracy of all final pop models: " + str(statistics.mean(sortedValAccs)))
 
-
     bestModel.append(finalModels[0])
     bestM = bestModel.pop()
-
 
     bestM.save('best_model.h5')
 

@@ -1,14 +1,16 @@
 # Final year project - Neural Network for Handwritten Digit Classification
 
-## ..Execution instructions:
+## Execution instructions:
 
-## Graphical User Interface for DigiFY App
-- Run the gui.py file from the terminal or inside an IDE. 
+### Graphical User Interface for the DigiFY App
+- To run the GUI, type the following command into a terminal: python gui.py
 
-## Model 
-- To run an individual instance of the model run the model.py script. 
+### Individual CNN Model 
+- To run an individual instance of the CNN model, type the following command into a terminal: python model.py 
 
-# Genetic Algorithm 
-- 
+### Genetic Algorithm backed CNN  
+- To run the genetic algorithm, type the following command into a terminal: python ga.py
 
+
+#### NOTE: Alternatively, you execute the files using a dedicated Python IDE (preferably PyCharm)
 
