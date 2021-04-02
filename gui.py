@@ -5,7 +5,7 @@ Author: Alex Waigumo Kabui
 
 Code Acknowledgments:
 => Data Flair - https://data-flair.training/blogs/python-deep-learning-project-handwritten-digit-recognition/
-
+=> user4815162342 - https://stackoverflow.com/questions/17317219/is-there-an-platform-independent-equivalent-of-os-startfile/17317468#17317468
 '''
 
 from keras.models import load_model
@@ -16,7 +16,7 @@ from tkinter import messagebox
 import matplotlib.pyplot as plt
 import numpy as np
 import webbrowser as wb
-import os
+import os, sys, subprocess
 
 # setting the initial values of the key variables to None as they do not have any data on entry
 pureImage, testImg = None, None
@@ -36,8 +36,10 @@ secondPredLabel2 = secondPredLabel
 thirdPredLabel2 = thirdPredLabel
 chartImage2 = chartImage
 
+
 # (pureImage, testImg, predictions, digits, accuracy,
 #  percentage, allPreds, allDigits, acc, classAccLabel, firstPredLabel, secondPredLabel, thirdPredLabel)
+# chartImage
 
 # creating tkinter window instance
 root = Tk()
@@ -198,9 +200,15 @@ def graph():
     chartImage.place(x = 900, y = 450)
     chartImage.create_image(0,0, image = plotToCanvas, anchor= NW)
 
-
+# play video function which walks the user through a short demo
+# of the app. The functionality below caters to all systems (Windows, Linux and MacOS).
+# As long as the user has an mp4 player installed they are able to access the popup via the 'Demo' button
 def playVid():
-    os.open("/Users/mxela10/PycharmProjects/fyp/AppWalkthru.mp4")
+    if sys.platform == "win32":
+        os.startfile("AppWalkthru.mp4")
+    else:
+        opener = "open" if sys.platform == "darwin" else "xdg-open"
+        subprocess.call([opener, "AppWalkthru.mp4"])
 
 # tkinter function destroy() function kills the
 # window instance.
@@ -283,7 +291,7 @@ btn_classify = Button(root, text = "Classify Digit", padx = 40, pady = 20, comma
 btn_clear = Button(root, text = "Clear Digit", padx = 40, pady = 20, command = clear_canvas)
 btn_insert = Button(root, text = "Insert Image", command = insert_digit)
 btn_help = Button(root, text = "Help", command = help)
-btn_vid = Button(root, text = "Demo", command = playVid)
+btn_vid = Button(root, text = "Demo", command = open_file)
 btn_quit = Button(root, text = "Quit", command = exitWindow)
 
 
