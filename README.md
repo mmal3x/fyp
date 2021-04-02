@@ -12,5 +12,5 @@
 - To run the genetic algorithm, type the following command into a terminal: python ga.py
 
 
-#### NOTE: Alternatively, you execute the files using a dedicated Python IDE (preferably PyCharm)
+#### NOTE: Alternatively, you can execute the files using a dedicated Python IDE (preferably PyCharm)
 
