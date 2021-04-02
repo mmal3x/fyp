@@ -38,8 +38,8 @@ chartImage2 = chartImage
 
 
 # (pureImage, testImg, predictions, digits, accuracy,
-#  percentage, allPreds, allDigits, acc, classAccLabel, firstPredLabel, secondPredLabel, thirdPredLabel)
-# chartImage
+#  percentage, allPreds, allDigits, acc, classAccLabel, firstPredLabel, secondPredLabel, thirdPredLabel
+# chartImage)
 
 # creating tkinter window instance
 root = Tk()
@@ -291,7 +291,7 @@ btn_classify = Button(root, text = "Classify Digit", padx = 40, pady = 20, comma
 btn_clear = Button(root, text = "Clear Digit", padx = 40, pady = 20, command = clear_canvas)
 btn_insert = Button(root, text = "Insert Image", command = insert_digit)
 btn_help = Button(root, text = "Help", command = help)
-btn_vid = Button(root, text = "Demo", command = open_file)
+btn_vid = Button(root, text = "Demo", command = playVid)
 btn_quit = Button(root, text = "Quit", command = exitWindow)
 
 
