@@ -1,3 +1,17 @@
+'''
+
+model.py
+
+Author: Alex Waigumo Kabui
+
+Code Acknowledgments:
+=> James Brownlee - https://machinelearningmastery.com/deep-learning-with-python/
+=> Yassine Ghouzam - https://www.kaggle.com/yassineghouzam
+=> Alex Waigumo Kabui - https://csgitlab.reading.ac.uk/CS3VI18-2020-2021/group_10/-/blob/master/VI-2020-21-Python_Package/cv-demo.py
+
+'''
+
+
 from keras.models import Sequential
 from keras.layers import Dropout, Flatten, Dense
 from keras.utils import np_utils
@@ -89,7 +103,7 @@ def final_model():
     # two convolutional layers with sizes 30. The ReLu activation function
     # is used for both of these layers. A max pooling layer
     # removes noisy activations the first two CNN layers.
-    modelInstance.add(Conv2D(filters = 30, kernel_size = (5,5),
+    modelInstance.add(Conv2D(filters = 30, kernel_size = (3,3),
                      input_shape = (28, 28, 1),
                      activation = 'relu'))
 
@@ -98,7 +112,7 @@ def final_model():
     modelInstance.add(MaxPooling2D(pool_size = (2,2)))
 
     # second layer of convolution containing 15 layers and 3x3 filters
-    modelInstance.add(Conv2D(filters = 15, kernel_size = (3,3),
+    modelInstance.add(Conv2D(filters = 15, kernel_size = (5,5),
                      activation = 'relu'))
 
     modelInstance.add(MaxPooling2D(pool_size = (2,2)))
@@ -172,7 +186,7 @@ def trainModel():
                                               train_ylabels,
                                               batch_size = 100),
                                  validation_data = (val_x, val_y),
-                                 epochs = 1, verbose = 2)
+                                 epochs = 10, verbose = 2)
 
 
     # getting the mean validation accuracy across all epochs in order to calculate the avg error.

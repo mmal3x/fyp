@@ -1,5 +1,16 @@
+'''
+ga.py
+
+Author: Alex Waigumo Kabui
+
+Code Acknowledgments:
+=> Shaashwat Agrawal - https://shaas2000.medium.com
+
+'''
+
+
 import random as rand
-from model import trainMultiple, final_model
+from model import trainMultiple, final_model, evaluate
 from keras.models import save_model
 import statistics
 

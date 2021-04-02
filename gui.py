@@ -1,3 +1,13 @@
+'''
+gui.py
+
+Author: Alex Waigumo Kabui
+
+Code Acknowledgments:
+=> Data Flair - https://data-flair.training/blogs/python-deep-learning-project-handwritten-digit-recognition/
+
+'''
+
 from keras.models import load_model
 from tkinter import *
 from PIL import ImageTk, Image
@@ -6,6 +16,7 @@ from tkinter import messagebox
 import matplotlib.pyplot as plt
 import numpy as np
 import webbrowser as wb
+import os
 
 # setting the initial values of the key variables to None as they do not have any data on entry
 pureImage, testImg = None, None
@@ -14,6 +25,7 @@ classAccLabel = None
 firstPredLabel = None
 secondPredLabel = None
 thirdPredLabel = None
+chartImage = None
 
 # saving the original None values of the variables above
 pureImage2, testImg2 = pureImage, testImg
@@ -22,6 +34,7 @@ classAccLabel2 = classAccLabel
 firstPredLabel2 = firstPredLabel
 secondPredLabel2 = secondPredLabel
 thirdPredLabel2 = thirdPredLabel
+chartImage2 = chartImage
 
 # (pureImage, testImg, predictions, digits, accuracy,
 #  percentage, allPreds, allDigits, acc, classAccLabel, firstPredLabel, secondPredLabel, thirdPredLabel)
@@ -81,8 +94,6 @@ def classify_digit():
     global accuracy
     global percentage
     global classAccLabel
-
-
 
     # should the user click on the classify digit button w/o inserting an image, the exception prompting them to insert
     # an image is raised.
@@ -152,7 +163,7 @@ def graph():
     global acc
 
     # exception block which prompts the user to insert and/or classify an image if the clear digit has been clicked
-    if predictions is None and allDigits is None and allPreds is None and acc is None: # and plotToCanvas is None and chartImage is None and resizedPlot is None and plot is None
+    if predictions is None and allDigits is None and allPreds is None and acc is None and chartImage is None: # and plotToCanvas is None and chartImage is None and resizedPlot is None and plot is None
             raise Exception(messagebox.showinfo("Info", "Please insert an image and/or classify it"))
 
         # predictions is None or allDigits is None or allPreds is None or acc is Non
@@ -188,6 +199,9 @@ def graph():
     chartImage.create_image(0,0, image = plotToCanvas, anchor= NW)
 
 
+def playVid():
+    os.open("/Users/mxela10/PycharmProjects/fyp/AppWalkthru.mp4")
+
 # tkinter function destroy() function kills the
 # window instance.
 def exitWindow():
@@ -211,6 +225,7 @@ def resetVar():
     global pureImage, testImg
     global predictions, digits, accuracy, percentage, allPreds, allDigits, acc
     global classAccLabel, firstPredLabel, secondPredLabel, thirdPredLabel
+    global chartImage
 
     # resetting the the variables back to None once the user has clicked clear digit
     pureImage, testImg = pureImage2, testImg2
@@ -219,6 +234,7 @@ def resetVar():
     firstPredLabel = firstPredLabel2
     secondPredLabel = secondPredLabel2
     thirdPredLabel = thirdPredLabel2
+    chartImage = chartImage2
 
 # function which opens the paint tool once the url is clicked
 def callback(url):
@@ -258,7 +274,7 @@ title.pack(pady = 20)
 # link to the paint tool
 btn_paint = Label(root, text = "Click here to draw your digit", fg= "blue", cursor = "hand2")
 btn_paint.place(x = 200, y = 22)
-btn_paint.bind("<Button-1>", lambda e: callback("https://jspaint.app/#local:41f86bef475158"))
+btn_paint.bind("<Button-1>", lambda e: callback("https://kleki.com/")) # https://jspaint.app/#local:41f86bef475158
 
 # button configuration. Here we create the five buttons needed for the app to run smoothly.
 # one of the functions in the command parameters are called once the user clicks on a button
@@ -267,7 +283,9 @@ btn_classify = Button(root, text = "Classify Digit", padx = 40, pady = 20, comma
 btn_clear = Button(root, text = "Clear Digit", padx = 40, pady = 20, command = clear_canvas)
 btn_insert = Button(root, text = "Insert Image", command = insert_digit)
 btn_help = Button(root, text = "Help", command = help)
+btn_vid = Button(root, text = "Demo", command = playVid)
 btn_quit = Button(root, text = "Quit", command = exitWindow)
+
 
 # placing the buttons on the screen.
 btn_graph.place(x = 100, y = 650)
@@ -275,6 +293,7 @@ btn_classify.place(x = 350, y = 650)
 btn_clear.place(x = 600, y = 650)
 btn_insert.place(x = 50, y = 20)
 btn_help.place(x = 150, y = 20)
+btn_vid.place(x = 400, y = 20)
 btn_quit.place(x = 1300, y = 20)
 
 # ensures the program continues
