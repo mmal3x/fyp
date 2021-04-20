@@ -1,15 +1,11 @@
-'''
+# model.py
 
-model.py
+# Author: Alex Waigumo Kabui
 
-Author: Alex Waigumo Kabui
-
-Code Acknowledgments:
-=> James Brownlee - https://machinelearningmastery.com/deep-learning-with-python/
-=> Yassine Ghouzam - https://www.kaggle.com/yassineghouzam
-=> Alex Waigumo Kabui - https://csgitlab.reading.ac.uk/CS3VI18-2020-2021/group_10/-/blob/master/VI-2020-21-Python_Package/cv-demo.py
-
-'''
+#Code Acknowledgments:
+# => James Brownlee - https://machinelearningmastery.com/deep-learning-with-python/
+# => Yassine Ghouzam - https://www.kaggle.com/yassineghouzam
+# => Alex Waigumo Kabui - https://csgitlab.reading.ac.uk/CS3VI18-2020-2021/group_10/-/blob/master/VI-2020-21-Python_Package/cv-demo.py
 
 
 from keras.models import Sequential
@@ -88,9 +84,9 @@ test_perc = 0.15
 # with the test size. The val_x and val_y params are used to validate the
 # train and hold out sets.
 train, val_x, train_ylabels, val_y = train_test_split(train,
-                                                         train_ylabels,
-                                                         test_size = test_perc,
-                                                         random_state = random_seed)
+                                                      train_ylabels,
+                                                      test_size = test_perc,
+                                                      random_state = random_seed)
 
 
 # example output of a digit in the dataset.
@@ -103,7 +99,7 @@ def final_model():
     # two convolutional layers with sizes 30. The ReLu activation function
     # is used for both of these layers. A max pooling layer
     # removes noisy activations the first two CNN layers.
-    modelInstance.add(Conv2D(filters = 30, kernel_size = (3,3),
+    modelInstance.add(Conv2D(filters = 30, kernel_size = (5,5),
                      input_shape = (28, 28, 1),
                      activation = 'relu'))
 
@@ -112,7 +108,7 @@ def final_model():
     modelInstance.add(MaxPooling2D(pool_size = (2,2)))
 
     # second layer of convolution containing 15 layers and 3x3 filters
-    modelInstance.add(Conv2D(filters = 15, kernel_size = (5,5),
+    modelInstance.add(Conv2D(filters = 15, kernel_size = (3,3),
                      activation = 'relu'))
 
     modelInstance.add(MaxPooling2D(pool_size = (2,2)))
@@ -192,7 +188,6 @@ def trainModel():
     # getting the mean validation accuracy across all epochs in order to calculate the avg error.
     print("Average validation accuracy across all epochs: " + str(np.mean(scores.history['val_accuracy'])))
 
-
     # subplot displaying and validation loss in terms of the training and validation sets
     plt.subplot(1, 2, 1)
     plt.title('Cross Entropy Loss')
@@ -204,6 +199,8 @@ def trainModel():
     plt.title('Training vs Validation Accuracy')
     plt.plot(scores.history['accuracy'], color='red', label='train')
     plt.plot(scores.history['val_accuracy'], color='purple', label='test')
+    plt.ylabel('accuracy (%)')
+    plt.xlabel('epoch')
     plt.show()
 
     return model
@@ -216,6 +213,7 @@ def trainMultiple(allModels):
 
     # list of losses is stored here
     allLosses = []
+    allClassAccs = []
     allValidationAccs = []
 
     # the fit_generator function trains
@@ -223,14 +221,17 @@ def trainMultiple(allModels):
     # to the train_ylabels variable
     for i in range(len(allModels)):
 
-        scores = allModels[i].fit_generator(datagen.flow(train, train_ylabels, batch_size = 200),
+        scores = allModels[i].fit_generator(datagen.flow(train,
+                                                         train_ylabels,
+                                                         batch_size = 100),
                                             validation_data = (val_x, val_y),
                                             epochs = 1, verbose = 2)
 
         allLosses.append(round(scores.history['loss'][-1], 4))
-        allValidationAccs.append(round(scores.history['val_accuracy'][-1],4))
+        allClassAccs.append(round(scores.history['accuracy'][-1], 4))
+        allValidationAccs.append(round(scores.history['val_accuracy'][-1], 4))
 
-    return allModels, allLosses, allValidationAccs
+    return allModels, allLosses, allClassAccs, allValidationAccs
 
 #-------------------------------------------------------------------------------------
 
@@ -246,21 +247,12 @@ def evaluate(actual, predicted, labels):
     tot_rec = np.average(rec, weights=inst)
     tot_f1 = np.average(f1_score, weights=inst)
     tot_sup = np.sum(inst)
-    # output table 1
-    dict1 = pd.DataFrame({
-        u'Label': labels,
-        u'Precision': pre,
-        u'Recall': rec,
-        u'F1': f1_score,
-        u'Support': inst
+
+    # defining output table
+    dict1 = pd.DataFrame({u'Label': labels, u'Precision': pre, u'Recall': rec, u'F1': f1_score, u'Support': inst
     })
-    # output table 2
-    dict2 = pd.DataFrame({
-        u'Label': [u'Average'],
-        u'Precision': [tot_pre],
-        u'Recall': [tot_rec],
-        u'F1': [tot_f1],
-        u'Support': [tot_sup]
+    # filled output table
+    dict2 = pd.DataFrame({u'Label': [u'Average'], u'Precision': [tot_pre], u'Recall': [tot_rec], u'F1': [tot_f1], u'Support': [tot_sup]
     })
 
     dict2.index = [99]
@@ -273,16 +265,12 @@ def evaluate(actual, predicted, labels):
 
     return confusion_mat, dictionary[[u'Label', u'Precision', u'Recall', u'F1', u'Support']]
 
-
-def main():
-
-    # returning the trained model and the binary label vectors
-    model = trainModel() # saving trained model
+def testModel(model):
 
     # labels for each digit in the test dataset converted from a df column
     # to a list
     y_true = test_dataset['label'].tolist()
-    print(y_true)
+    # print(y_true)
 
     # label encoding the test data labels so the confusion matrix can
     # be calculated
@@ -299,7 +287,8 @@ def main():
     # converting the predictions to binary vectors in order to compare the predicted
     # values w/ the actual values. val_y is the expected output of the val_x input
     predicted_classes = np.argmax(y_preds, axis=1)
-    print(predicted_classes.tolist())
+    predicted_classes.tolist()
+    #print(predicted_classes)
 
     # evaluating the model on the test data find out the strength of the model
     # on unseen data.
@@ -312,6 +301,16 @@ def main():
     sns.heatmap(conf_matrix, annot=True, fmt= ".1f")
     plt.show()
 
+def main():
+
+    # returning the trained model and the binary label vectors
+    model = trainModel() # saving trained model
+
+    # evaluating the performance of the model on test data
+    testModel(model)
+
+    # saving the single instance model
+    model.save('single_instance.h5')
 
 if __name__ == "__main__":
     main()

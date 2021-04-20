@@ -1,12 +1,10 @@
-'''
-gui.py
+# gui.py
 
-Author: Alex Waigumo Kabui
+# Author: Alex Waigumo Kabui
 
-Code Acknowledgments:
-=> Data Flair - https://data-flair.training/blogs/python-deep-learning-project-handwritten-digit-recognition/
-=> user4815162342 - https://stackoverflow.com/questions/17317219/is-there-an-platform-independent-equivalent-of-os-startfile/17317468#17317468
-'''
+# Code Acknowledgments:
+# => Data Flair - https://data-flair.training/blogs/python-deep-learning-project-handwritten-digit-recognition/
+# => user4815162342 - https://stackoverflow.com/questions/17317219/is-there-an-platform-independent-equivalent-of-os-startfile/17317468#17317468
 
 from keras.models import load_model
 from tkinter import *
@@ -106,7 +104,7 @@ def classify_digit():
     testImg = pureImage
     width, height = testImg.size
 
-# the image should be above 28 by 28 pixels
+    # the image should be above 28 by 28 pixels
     if(height >= 28 and width >= 28):
 
         # resizing the image to 28x28 pixels
@@ -256,14 +254,15 @@ def help():
                               "NOTE:The background should preferably be \n\n"
                               "black or another dark colour with the digit\n\n"
                               "in white. Use the paint tools to make the \n\n"
-                              "necessary changes.\n\n"
+                              "necessary changes. You can watch a \n\n"
+                              "walk-through by clicking Demo above. \n\n"
                               "2. Save the image as a png or jpeg.\n\n"
                               "3. Insert the image using the button on \n\n"
                               "the top left.\n\n"
                               "4. Hit the classify button to test your \n\n"
                               "digit and ouput the top 3 predictions.\n\n"
                               "5. For further prediction information, \n\n"
-                              "click Show Accuracies\n\n", font = ("Helvitica", 14, "bold"), justify=LEFT)
+                              "click Show Accuracies.\n\n", font = ("Helvitica", 14, "bold"), justify=LEFT)
 
     info.pack()
     info.place(x = 50, y = 100)
@@ -289,11 +288,10 @@ btn_paint.bind("<Button-1>", lambda e: callback("https://kleki.com/")) # https:/
 btn_graph = Button(root, text = "Show Accuracies", padx = 40, pady = 20, command = graph)
 btn_classify = Button(root, text = "Classify Digit", padx = 40, pady = 20, command = classify_digit)
 btn_clear = Button(root, text = "Clear Digit", padx = 40, pady = 20, command = clear_canvas)
-btn_insert = Button(root, text = "Insert Image", command = insert_digit)
+btn_insert = Button(root, text = "Insert Digit", command = insert_digit)
 btn_help = Button(root, text = "Help", command = help)
 btn_vid = Button(root, text = "Demo", command = playVid)
 btn_quit = Button(root, text = "Quit", command = exitWindow)
-
 
 # placing the buttons on the screen.
 btn_graph.place(x = 100, y = 650)

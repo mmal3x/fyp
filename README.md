@@ -1,4 +1,6 @@
-# Final year project - Neural Network for Handwritten Digit Classification
+# Final Year Project - Neural Network for Handwritten Digit Classification
+
+#### Donwnload the mnist_train.csv file here => [https://www.kaggle.com/oddrationale/mnist-in-csv?select=mnist_train.csv] and paste it in the project directory. 
 
 ## Execution instructions:
 
@@ -13,4 +15,6 @@
 
 
 #### NOTE: Alternatively, you can execute the files using a dedicated Python IDE (preferably PyCharm)
+
+
 

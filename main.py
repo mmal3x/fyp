@@ -1,21 +1,17 @@
-import os
-import time
-
-
-# os.environ["KERAS_BACKEND"] = "plaidml.keras.backend"
-#
-import model as mod
+from keras.models import load_model
+from model import testModel
 
 
 def main():
 
-    # start = time.time()
 
     #print("\nRun individual CNN model, Genetic CNN model or GUI: \n")
 
     # model, scores = mod.trainModel()
 
-    # print("\nRan in {} seconds".format(time.time()-start))
+    # testing a model on the unseen test data
+    model = load_model("INSERT .h5 FILE NAME HERE")
+    testModel(model)
 
 
 if __name__ == "__main__":

@@ -1,21 +1,18 @@
-'''
-ga.py
+# ga.py
 
-Author: Alex Waigumo Kabui
+# Author: Alex Waigumo Kabui
 
-Code Acknowledgments:
-=> Shaashwat Agrawal - https://shaas2000.medium.com
-
-'''
-
+# Code Acknowledgments:
+# Shaashwat Agrawal - https://shaas2000.medium.com
 
 import random as rand
-from model import trainMultiple, final_model, evaluate
+import matplotlib.pyplot as plt
+from model import trainMultiple, final_model, testModel
 from keras.models import save_model
 import statistics
 
 layers = [0, 2, 6, 7, 8] # the layers in the convnet which contain weights (the filters are the learnable parameters)
-model_pop = 10 # defining 10 individuals in the init population
+model_pop = 5 # defining 10 individuals in the init population
 generations = 2 # defining the stopping limit for the number of generations to train and breed
 mutation_rate = 0.1 # 10% mutation rate
 models = [] # storing each model
@@ -97,7 +94,7 @@ def crossover(models):
                 second_parent = rand.choice(models[:])
 
             # should the random number be less than the crossover
-            # rate, the weights of the parents are swapped to diversify
+            # rate, the bias weights of the parents are swapped to diversify
             # the models by allowing them to access the weights
             # of other models (group consciousness)
 
@@ -106,7 +103,7 @@ def crossover(models):
                 if(c_rand < crossover_rate):
                     weightsFirst = first_parent.layers[i].get_weights()[1]
 
-                    # crossing over the weights of the second parent to the first parent & vice versa
+                    # crossing over the bias weights of the second parent to the first parent & vice versa
                     first_parent.layers[i].get_weights()[1] = second_parent.layers[i].get_weights()[1]
                     second_parent.layers[i].get_weights()[1] = weightsFirst
 
@@ -159,53 +156,73 @@ def main():
     # the initialise method appends 10 model architectures into models []
     initialise()
 
+    # saving the avg accuracy scores for each generation
+    # and the generation number
+    fullClassAccList = []
+    fullValidAccList = []
+    num_of_gens = []
+
     for gen_no in range(generations):
 
         gen_counter = gen_no + 1
+        num_of_gens.append(gen_counter)
         # calling the trainMultiple function created in model.py
         # to train many models over x epochs and print the loss information
-        models, loss, validAccs = trainMultiple(models)
+        models, loss, classAccs, validAccs = trainMultiple(models)
         print(loss)
         lossInfo = ', '.join(str(v) for v in loss)
         print("Generation Number: " + str((gen_counter)) + "\n" + "Training loss Values for each member: \n" + lossInfo)
 
+        # retrieving the avg classification and validation accuracies of all models per generation
+        fullClassAccList.append(statistics.mean(classAccs))
+        fullValidAccList.append(statistics.mean(validAccs))
+
         # the trained models and loss info are used to
-        # select the next population
+
+        # calculate the fitness of the next population
         models = selection(models, loss)
 
 
     # getting the best model
     bestModel = []
 
-    # retrieving the model with the highest validation accuracy by assigning a
-    # value to all the the accuracies - thereby ordering the models accordingly
+    # retrieving the model with the highest validation accuracy
     sortedValAccs = sorted(validAccs)
     finalValidAccs = sorted(range(len(validAccs)), key=lambda i:validAccs[i])
     finalModels = [models[i] for i in finalValidAccs]
 
     finalModels.reverse() # best model comes first
 
-
+    # converting validation accuracies to string representation
     validInfo = ', '.join(str(v) for v in sortedValAccs)
     print("Validation Accuracies of the final 10 models: \n" + validInfo)
     print("Average validation accuracy of all final pop models: " + str(statistics.mean(sortedValAccs)))
 
-    bestModel.append(finalModels[0])
-    bestM = bestModel.pop()
+    # appending the best model to a variable
+    bestModel = finalModels[0]
 
-    bestM.save('best_model.h5')
+    # subplot displaying and validation loss in terms of the training and validation sets
+    # plt.subplot(1, 2, 1)
+    # plt.title('Cross Entropy Loss')
+    # plt.plot(finalScores.history['loss'], color='red', label='train')
+    # plt.plot(finalScores.history['val_loss'], color='purple', label='test')
+
+    # subplot displaying classification accuracy in terms of the training and validation sets
+    plt.subplot(1, 2, 2)
+    plt.title('Avg Classification/Validation Accuracy')
+    plt.plot(fullClassAccList, color='red', label='train')
+    plt.plot(fullValidAccList, color='purple', label='test')
+    plt.ylabel('accuracy (%)')
+    plt.xlabel('generation')
+    #plt.xticks(gen_counter)
+    plt.show()
+
+    # testing the best model on unseen data
+    testModel(bestModel)
+
+    # saving best model to a h5 file
+    bestModel.save('best_model.h5')
 
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
-
-
-
-
-
-
